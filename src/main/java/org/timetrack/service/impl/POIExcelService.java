@@ -32,8 +32,9 @@ public class POIExcelService implements ExcelService {
                     System.err.println("Error creating new workbook: " + e.getMessage());
                 }
             } else {
-                try (InputStream is = new FileInputStream(file);
-                     Workbook workbook = WorkbookFactory.create(is)) {
+                try (FileInputStream fis = new FileInputStream(file); // First, open FileInputStream
+                     BufferedInputStream bis = new BufferedInputStream(fis); // Wrap it in BufferedInputStream
+                     Workbook workbook = WorkbookFactory.create(bis)) { // Use BufferedInputStream
                     Sheet sheet = workbook.getSheetAt(0);
                     appendRow(sheet, event);
                     writeFile(workbook, file);

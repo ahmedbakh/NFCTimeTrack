@@ -17,11 +17,10 @@ public class NFCTimeTrackApp {
         try {
             ConfigService configService = new FileConfigService();
             ExcelService excelService = new POIExcelService();
-            String configPath = "D:\\employes_cards_config.txt";
+            String configPath = "D:\\AstrelyaTimeTrackApp\\EmplyeeCardAssign\\employes_cards_config.txt";
            //1 Map<String, String> cardOwnershipMap = configService.loadCardOwnershipConfig(configPath);
             TimeTrackService service = new TimeTrackService(configService, excelService);
-            String baseFilePath = "D:\\";
-
+            String baseFilePath = "D:\\AstrelyaTimeTrackApp\\TimeTrackExcel";
             CardReaderService reader = new CardReaderServiceACR122U("PcSC");
             reader.connectReader();
 
@@ -31,6 +30,7 @@ public class NFCTimeTrackApp {
                     byte[] uid = reader.getUID();
                     if (uid != null) {
                         String scannedUID = byteArrayToHexWithSeparator(uid);
+                        System.out.println(scannedUID);
                         String filePath = generateFilePath(baseFilePath);
                         service.processCardScan(scannedUID, filePath,configPath);
                     } else {

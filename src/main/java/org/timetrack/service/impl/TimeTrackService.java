@@ -31,7 +31,7 @@ public class TimeTrackService {
         if (!owner.equals(lastScannedOwner) || (currentTime - lastScannedTime > 3600000)) {
             if (owner.equals("Carte non attribuée")) {
                 // Update config only if this is a new or unassigned card
-                configService.updateCardOwnershipConfig(uid, owner, configPath);
+                //configService.updateCardOwnershipConfig(uid, owner, configPath);
                 cardOwnershipMap.put(uid, owner);
                 System.out.println("Updated config file with new UID.");
             }

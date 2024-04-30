@@ -12,7 +12,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="Smart-TimeTrack-Astrelya" options="" />
+      <module name="Smart-TimeTrack-Astrelya" options="--add-modules java.smartcardio" />
     </option>
   </component>
 </project>
