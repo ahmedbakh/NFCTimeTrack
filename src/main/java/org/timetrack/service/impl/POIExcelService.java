@@ -36,6 +36,7 @@ public class POIExcelService implements ExcelService {
                      BufferedInputStream bis = new BufferedInputStream(fis); // Wrap it in BufferedInputStream
                      Workbook workbook = WorkbookFactory.create(bis)) { // Use BufferedInputStream
                     Sheet sheet = workbook.getSheetAt(0);
+
                     appendRow(sheet, event);
                     writeFile(workbook, file);
                     success = true;

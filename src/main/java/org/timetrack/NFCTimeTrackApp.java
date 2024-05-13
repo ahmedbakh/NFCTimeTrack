@@ -20,7 +20,7 @@ public class NFCTimeTrackApp {
             String configPath = "D:\\AstrelyaTimeTrackApp\\EmplyeeCardAssign\\employes_cards_config.txt";
            //1 Map<String, String> cardOwnershipMap = configService.loadCardOwnershipConfig(configPath);
             TimeTrackService service = new TimeTrackService(configService, excelService);
-            String baseFilePath = "D:\\AstrelyaTimeTrackApp\\TimeTrackExcel";
+            String baseFilePath = "D:\\AstrelyaTimeTrackApp\\TimeTrackExcel\\";
             CardReaderService reader = new CardReaderServiceACR122U("PcSC");
             reader.connectReader();
 
