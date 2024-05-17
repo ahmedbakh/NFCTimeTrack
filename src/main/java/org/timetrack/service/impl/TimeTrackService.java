@@ -22,32 +22,30 @@ public class TimeTrackService {
         long currentTime = System.currentTimeMillis();
 
         // Reload the ownership map from the configuration file every time a card is scanned
-        Map<String, String> cardOwnershipMap = configService.loadCardOwnershipConfig(configPath);
+        Map<String, String[]> cardOwnershipMap = configService.loadCardOwnershipConfig(configPath);
 
-        // Get owner or default to "Carte non attribuée"
-        String owner="";
-        if(cardOwnershipMap.containsKey(uid)){
-             owner = cardOwnershipMap.get(uid);
+        // Get owner and visitor card or default to "Carte non attribuée"
+        String owner = "Carte non attribuée";
+        String visitorCard = "CarteVisiteur?";
+
+        if (cardOwnershipMap.containsKey(uid)) {
+            String[] values = cardOwnershipMap.get(uid);
+            visitorCard = values[0];
+            owner = values[1];
+        } else if (currentTime - lastScannedTime > 5000) {
+            // Update config only if this is a new or unassigned card
+            configService.updateCardOwnershipConfig(uid, visitorCard, owner, configPath);
+            System.out.println("Updated config file with new UID.");
         }
-        // Check if this UID was recently scanned
-        if ((currentTime - lastScannedTime > 5000)) {
-            if (owner.isEmpty()) {
-                // Update config only if this is a new or unassigned card
-                owner="Carte non attribuée";
-                configService.updateCardOwnershipConfig(uid, owner, configPath);
-                cardOwnershipMap.put(uid, owner);
-                System.out.println("Updated config file with new UID.");
-            }
-            else if(!owner.equals("Carte non attribuée")){
-                CardEvent event = new CardEvent(owner, uid, POIExcelService.getCurrentFormattedDate());
-                event.setEventType(determineEventType(currentTime));
-                excelService.writeExcelEntry(event, filePath);
-            }
 
-            // Update the last scanned UID and time
-
-            lastScannedTime = currentTime;
+        // Add the entry to the Excel file only if the card is assigned to someone
+        if (!owner.equals("Carte non attribuée")) {
+            CardEvent event = new CardEvent(owner, uid, POIExcelService.getCurrentFormattedDate());
+            event.setEventType(determineEventType(currentTime));
+            excelService.writeExcelEntry(event, filePath, visitorCard);
         }
+
+        lastScannedTime = currentTime;
     }
 
     private String determineEventType(long currentTimeMillis) {

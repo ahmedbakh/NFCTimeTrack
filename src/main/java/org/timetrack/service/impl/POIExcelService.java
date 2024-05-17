@@ -13,7 +13,7 @@ import java.util.Date;
 public class POIExcelService implements ExcelService {
 
     @Override
-    public void writeExcelEntry(CardEvent event, String filePath) {
+    public void writeExcelEntry(CardEvent event, String filePath, String cardNumber) {
         final int MAX_RETRIES = 5;
         int attempt = 0;
         boolean success = false;
@@ -26,6 +26,7 @@ public class POIExcelService implements ExcelService {
                     Workbook workbook = new XSSFWorkbook();
                     Sheet sheet = workbook.createSheet("TimeTrack");
                     createHeaderRow(sheet);
+                    appendRow(sheet, event, cardNumber); // Add the first entry immediately
                     writeFile(workbook, file);
                     success = true;
                 } catch (IOException e) {
@@ -37,7 +38,7 @@ public class POIExcelService implements ExcelService {
                      Workbook workbook = WorkbookFactory.create(bis)) { // Use BufferedInputStream
                     Sheet sheet = workbook.getSheetAt(0);
 
-                    appendRow(sheet, event);
+                    appendRow(sheet, event, cardNumber);
                     writeFile(workbook, file);
                     success = true;
                 } catch (FileNotFoundException e) {
@@ -56,21 +57,23 @@ public class POIExcelService implements ExcelService {
         }
     }
 
-    private void appendRow(Sheet sheet, CardEvent event) {
+    private void appendRow(Sheet sheet, CardEvent event, String cardNumber) {
         int lastRowNum = sheet.getLastRowNum() + 1;
         Row newRow = sheet.createRow(lastRowNum);
         newRow.createCell(0).setCellValue(event.getUid());
-        newRow.createCell(1).setCellValue(event.getOwner());
-        newRow.createCell(2).setCellValue(event.getDate());
-        newRow.createCell(3).setCellValue(determineEventType()); // Determine event type based on time
+        newRow.createCell(1).setCellValue(cardNumber);
+        newRow.createCell(2).setCellValue(event.getOwner());
+        newRow.createCell(3).setCellValue(event.getDate());
+        newRow.createCell(4).setCellValue(determineEventType()); // Determine event type based on time
     }
 
     private void createHeaderRow(Sheet sheet) {
         Row headerRow = sheet.createRow(0);
         headerRow.createCell(0).setCellValue("UID");
-        headerRow.createCell(1).setCellValue("Owner");
-        headerRow.createCell(2).setCellValue("Date");
-        headerRow.createCell(3).setCellValue("Event Type");
+        headerRow.createCell(1).setCellValue("Card Number");
+        headerRow.createCell(2).setCellValue("Owner");
+        headerRow.createCell(3).setCellValue("Date");
+        headerRow.createCell(4).setCellValue("Event Type");
     }
 
     private void writeFile(Workbook workbook, File file) throws IOException {

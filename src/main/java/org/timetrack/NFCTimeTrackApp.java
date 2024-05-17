@@ -18,11 +18,14 @@ public class NFCTimeTrackApp {
             ConfigService configService = new FileConfigService();
             ExcelService excelService = new POIExcelService();
             String configPath = "D:\\AstrelyaTimeTrackApp\\EmplyeeCardAssign\\employes_cards_config.txt";
-           //1 Map<String, String> cardOwnershipMap = configService.loadCardOwnershipConfig(configPath);
             TimeTrackService service = new TimeTrackService(configService, excelService);
             String baseFilePath = "D:\\AstrelyaTimeTrackApp\\TimeTrackExcel\\";
             CardReaderService reader = new CardReaderServiceACR122U("PcSC");
-            reader.connectReader();
+
+            if (!reader.connectReader()) {
+                System.err.println("Failed to connect to the card reader. Exiting...");
+                return;
+            }
 
             while (true) {
                 if (reader.isCardPresent()) {
@@ -32,7 +35,7 @@ public class NFCTimeTrackApp {
                         String scannedUID = byteArrayToHexWithSeparator(uid);
                         System.out.println(scannedUID);
                         String filePath = generateFilePath(baseFilePath);
-                        service.processCardScan(scannedUID, filePath,configPath);
+                        service.processCardScan(scannedUID, filePath, configPath);
                     } else {
                         System.out.println("Unable to read the card UID.");
                     }

@@ -2,20 +2,22 @@ package org.timetrack.service.impl;
 
 import com.java.smartcard.acr122u.ACR122UReaderHelper;
 import org.timetrack.service.CardReaderService;
+import com.java.smartcard.acr122u.ACR122UReaderHelper;
+import org.timetrack.service.CardReaderService;
 
 import javax.smartcardio.CardException;
+
 public class CardReaderServiceACR122U implements CardReaderService {
     private ACR122UReaderHelper reader;
 
     public CardReaderServiceACR122U(String readerName) {
-        this.reader = ACR122UReaderHelper.getInstance();  // Correctly initialize the class member
+        this.reader = ACR122UReaderHelper.getInstance();
     }
 
     @Override
     public boolean connectReader() {
         try {
-            reader.connectReader();
-            return true;
+            return reader.connectReader();
         } catch (CardException e) {
             System.err.println("Failed to connect to reader: " + e.getMessage());
             return false;
@@ -43,7 +45,7 @@ public class CardReaderServiceACR122U implements CardReaderService {
     @Override
     public void connectCard(String protocol) {
         try {
-            reader.connectCard(protocol);  // Use the protocol parameter as intended
+            reader.connectCard(protocol);
         } catch (CardException e) {
             System.err.println("Failed to connect to the card using protocol " + protocol + ": " + e.getMessage());
         }
