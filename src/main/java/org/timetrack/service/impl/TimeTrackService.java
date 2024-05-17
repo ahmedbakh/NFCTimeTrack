@@ -10,7 +10,7 @@ import java.util.Map;
 public class TimeTrackService {
     private ConfigService configService;
     private ExcelService excelService;
-    private String lastScannedOwner = "";
+
     private long lastScannedTime = 0;
 
     public TimeTrackService(ConfigService configService, ExcelService excelService) {
@@ -25,23 +25,27 @@ public class TimeTrackService {
         Map<String, String> cardOwnershipMap = configService.loadCardOwnershipConfig(configPath);
 
         // Get owner or default to "Carte non attribuée"
-        String owner = cardOwnershipMap.getOrDefault(uid, "Carte non attribuée");
-
+        String owner="";
+        if(cardOwnershipMap.containsKey(uid)){
+             owner = cardOwnershipMap.get(uid);
+        }
         // Check if this UID was recently scanned
-        if (!owner.equals(lastScannedOwner) || (currentTime - lastScannedTime > 3600000)) {
-            if (owner.equals("Carte non attribuée")) {
+        if ((currentTime - lastScannedTime > 5000)) {
+            if (owner.isEmpty()) {
                 // Update config only if this is a new or unassigned card
+                owner="Carte non attribuée";
                 configService.updateCardOwnershipConfig(uid, owner, configPath);
                 cardOwnershipMap.put(uid, owner);
                 System.out.println("Updated config file with new UID.");
             }
-
-            CardEvent event = new CardEvent(owner, uid, POIExcelService.getCurrentFormattedDate());
-            event.setEventType(determineEventType(currentTime));
-            excelService.writeExcelEntry(event, filePath);
+            else if(!owner.equals("Carte non attribuée")){
+                CardEvent event = new CardEvent(owner, uid, POIExcelService.getCurrentFormattedDate());
+                event.setEventType(determineEventType(currentTime));
+                excelService.writeExcelEntry(event, filePath);
+            }
 
             // Update the last scanned UID and time
-            lastScannedOwner = owner;
+
             lastScannedTime = currentTime;
         }
     }
